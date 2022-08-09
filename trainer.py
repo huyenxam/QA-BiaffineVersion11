@@ -86,11 +86,11 @@ class Trainer(object):
         )
         loss_func = torch.nn.CrossEntropyLoss(reduction='mean')
 
-        for epoch in tqdm(trange(self.args.num_epochs)):
+        for epoch in trange(self.args.num_epochs):
             train_loss = 0
             print('EPOCH:', epoch)
             self.model.train()
-            for step, batch in tqdm(enumerate(train_dataloader)):
+            for step, batch in enumerate(train_dataloader):
                 batch = tuple(t.to(self.device) for t in batch)
 
                 inputs = {'input_ids': batch[0],
@@ -139,7 +139,7 @@ class Trainer(object):
         loss_func = torch.nn.CrossEntropyLoss(reduction='mean')
         eval_loss = 0
         outputs = []
-        for batch in tqdm(eval_dataloader):
+        for batch in eval_dataloader:
             batch = tuple(t.to(self.device) for t in batch)
 
             inputs = {'input_ids': batch[0],
