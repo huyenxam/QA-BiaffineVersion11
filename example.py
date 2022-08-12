@@ -106,7 +106,7 @@ class Predictor(object):
         for i in range(len(cate_pred)):
             for j in range(i, len(cate_pred)):
                 if cate_pred[i][j] > 0:
-                    tmp = (self.label_set[cate_pred[i][j].item()], i, j, span_scores[i][j].item())
+                    tmp = (self.label_set[cate_pred[i][j].item()], i, j, input_tensor[i][j].item())
                     top_span.append(tmp)
         
         top_span = sorted(top_span, reverse=True, key=lambda x: x[3])
@@ -127,11 +127,8 @@ class Predictor(object):
         for word in sent:
             character = self.get_character(word, self.max_char_len)
             char_seq.append(character)
-        
-        char_ids = self.character2id(char_seq, max_seq_length=self.max_seq_length)
-
-        # if self.args.use_char:
-        #     char_ids = self.character2id(char_seq, max_seq_length=self.max_seq_length)
+        if self.args.use_char:
+            char_ids = self.character2id(char_seq, max_seq_length=self.max_seq_length)
 
         inputs = {'input_ids' :  input_ids.unsqueeze(dim=0).to(self.device),
                   'attention_mask' :  attention_mask.unsqueeze(dim=0).to(self.device),
@@ -140,21 +137,22 @@ class Predictor(object):
         }
 
         with torch.no_grad():
-            outputs = self.model(**inputs)
+            outputs = self.model(**input_ids)
         
         input_tensor, cate_pred = outputs[0].max(dim=-1)
-        label = self.get_pred_entity(cate_pred, input_tensor)[0]
+        label = self.get_pred_entity(cate_pred, input_tensor)
         start_ans = label[1]
         end_ans = label[2]
 
-        sentence = ['SEP'] + question + ['CLS'] + context
         print(start_ans)
         print(end_ans)
-        text_ans = " ".join(sentence[start_ans:end_ans+1])
+        text_ans = " ".join(sent[start_ans:end_ans+1])
         print(text_ans)
         return text_ans
+
         
-def get_ans(context, question):
+
+if __name__=='__main__':
     parser = argparse.ArgumentParser()
 
     # dataset
@@ -177,14 +175,10 @@ def get_ans(context, question):
     parser.add_argument('--checkpoint_path', default='/content/gdrive/MyDrive/QA-BiaffineVersion11/results/checkpoint.pth')
     args, unk = parser.parse_known_args()
 
-    p = Predictor(args)
-    # print(p.predict(context, question))
-    return p.predict(context, question)
-
-if __name__=='__main__':
     
     question = "Bình được công nhận với danh hiệu gì ?"
     context = "Bình Nguyễn là một người đam mê với lĩnh vực xử lý ngôn ngữ tự nhiên . Anh nhận chứng chỉ Google Developer Expert năm 2020"
     
-    print(get_ans(context, question))
+    p = Predictor(args)
+    print(p.predict(context, question))
 
