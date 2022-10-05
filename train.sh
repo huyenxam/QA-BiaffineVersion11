@@ -14,9 +14,9 @@ export CHAR_VOCAB_SIZE=108
 export HIDDEN_DIM=728
 export HIDDEN_DIM_FFW=300
 export NUM_LABELS=2
-export MODEL_NAME_OR_PATH="xlm-roberta-base"
+export MODEL_NAME_OR_PATH="xlm-roberta-large"
 export NUM_EPOCHS=20
-export LEARNING_RATE=5e-6
+export LEARNING_RATE=1e-5
 export ADAM_EPSILON=1e-8
 export WEIGHT_DECAY=0.01
 export WARMUP_STEPS=0
@@ -48,4 +48,4 @@ python train.py --train_path $TRAIN_PATH \
                 --label_set_path $LABEL_SET_PATH \
                 --do_eval \
                 --do_train \
-                --use_char \
+                # --use_char \
